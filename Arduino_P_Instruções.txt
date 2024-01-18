@@ -1,0 +1,8 @@
+Descarregar o software p5.serialcontrol para estabelecer comunicação entre o Arduino e o Skectch P5
+https://github.com/p5-serial/p5.serialcontrol/releases
+
+Descarregar a biblioteca Comunicação Serial para P5
+p5.serialport.js
+https://github.com/p5-serial/p5.serialport/tree/main/lib
+
+
