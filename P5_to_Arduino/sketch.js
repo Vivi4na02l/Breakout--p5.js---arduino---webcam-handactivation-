@@ -18,7 +18,7 @@ let predictions = [];
  * size and position of canvas + definiting the port being used to detect the arduino in use
  */
 function setup() {
-  createCanvas(windowWidth, windowHeight);
+  createCanvas(300, 150);
   frameRate(15);
   rectMode(CENTER);
   fill(0, 0, 0);
@@ -29,19 +29,23 @@ function setup() {
 
 
   //* ML5 */
-  video = createCapture(VIDEO);
-  video.size(width, height);
+  video = createCapture(VIDEO, webcamIsReady);
 
   handpose = ml5.handpose(video, modelReady);
-
-  // This sets up an event that fills the global variable "predictions"
-  // with an array every time new hand poses are detected
   handpose.on("predict", results => {
     predictions = results;
   });
 
-  // Hide the video element, and just show the canvas
   video.hide();
+}
+
+let dims = {};
+ 
+function webcamIsReady() {
+  resizeCanvas(window.innerWidth, window.innerHeight) // redimensiona o Canvas para ter o mesmo do video
+
+  dims.canvasWidth = window.innerWidth, dims.canvasHeight = window.innerHeight
+  dims.videoWidth = video.width, dims.videoHeight = video.height
 }
 
 
@@ -67,6 +71,12 @@ function draw() {
 
   
   //* ML5 */
+  //move image by the width of image to the left
+  translate(width, 0);
+  //then scale it by -1 in the x-axis
+  //to flip the image
+  scale(-1, 1);
+  //draw video capture feed as image inside p5 canvas
   image(video, 0, 0, width, height);
 
   // We can call both functions to draw all keypoints and the skeletons
@@ -77,13 +87,29 @@ function draw() {
  * function that draws ellipses over the detected keypoints
  */
 function drawKeypoints() {
+  // for (let i = 0; i < predictions.length; i += 1) {
+  //   const prediction = predictions[i];
+  //   for (let j = 0; j < prediction.landmarks.length; j += 1) {
+  //     const keypoint = prediction.landmarks[j];
+  //     fill(0, 255, 0);
+  //     noStroke();
+  //     circle(keypoint[0], keypoint[1], 10);
+  //   }
+  // }
+
   for (let i = 0; i < predictions.length; i += 1) {
     const prediction = predictions[i];
     for (let j = 0; j < prediction.landmarks.length; j += 1) {
       const keypoint = prediction.landmarks[j];
       fill(0, 255, 0);
       noStroke();
-      ellipse(keypoint[0], keypoint[1], 10);
+      circle(keypoint[0], keypoint[1], 10);
+ 
+      fill(255, 255, 0);
+      noStroke();
+      let newX = map(keypoint[0], 0, dims.videoWidth, 0, dims.canvasWidth)
+      let newY = map(keypoint[1], 0, dims.videoHeight, 0, dims.canvasHeight)
+      circle(newX, newY, 10);
     }
   }
 }
