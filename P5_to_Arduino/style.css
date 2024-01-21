@@ -23,6 +23,8 @@ canvas {
   justify-content: center;
 } .jcsa {
   justify-content: space-around;
+} .jcsb {
+  justify-content: space-between;
 }
 
 .aic {
@@ -52,8 +54,12 @@ canvas {
 
 
 /** CSS for displays that will be turned on and off */
-#mainMenu {
+#mainMenu, #calibrationScreen {
   position: absolute;
   left: 0px;
   top: 0px;
+}
+
+#calibrationScreen {
+  display: none;
 }

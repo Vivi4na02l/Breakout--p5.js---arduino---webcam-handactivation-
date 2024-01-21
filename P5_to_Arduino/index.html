@@ -20,20 +20,20 @@
       <h1>[nome]</h1>
 
       <div class="dflex fdc jcc aic">
-        <div id="btnPlay" class="hrefNO dif btnPlus">
+        <div id="btnPlay" class="dflex jcc aic btnPlus">
           <p class="txtW" style="margin: 0;">
               JOGAR
           </p>
         </div>
   
-        <div id="divControls" class="dflex fdr jcsa">
-          <div href="#" class="hrefNO dif btnPlus">
+        <div id="divControls" class="dflex fdr jcsb">
+          <div id="btnJoystick" class="dflex jcc aic btnPlus">
             <p class="txtW" style="margin: 0;">
               joystick
             </p>
           </div>
 
-          <div href="#" class="hrefNO dif btnPlus">
+          <div id="btnHand" class="dflex jcc aic btnPlus">
             <p class="txtW" style="margin: 0;">
               mão
             </p>
@@ -43,7 +43,21 @@
 
     </div>
 
-    <script src="mainMenu.js"></script>
+
+
+    <!-- div for calibration screen -->
+    <div id="calibrationScreen" class="dflex fdc jcsa aic">
+      <div>
+        <div id="btnHand" class="hrefNO dif btnPlus">
+          <p class="txtW" style="margin: 0;">
+            ◀ return
+          </p>
+        </div>
+      </div>
+    </div>
+
+
+    <script src="menus.js"></script>
     <script src="sketch.js"></script>
   </body>
 </html>
