@@ -5,3 +5,55 @@ html, body {
 canvas {
   display: block;
 }
+
+/** CSS for structuring */
+.dflex {
+  display: flex;
+} .dif {
+  display: inline-flex;
+}
+
+.fdc {
+  flex-direction: column;
+} .fdr {
+  flex-direction: row;
+}
+
+.jcc {
+  justify-content: center;
+} .jcsa {
+  justify-content: space-around;
+}
+
+.aic {
+  align-items: center;
+}
+
+
+/** CSS of buttons */
+.btnPlus {
+  cursor: pointer;
+
+  border-style: solid;
+  border-width: 2px;
+  border-color: white;
+  background-color: #8A54B1;
+  border-radius: 10px;
+}
+
+
+
+/** CSS for text */
+.hrefNO {
+  color: #000;
+  text-decoration: none;
+}
+
+
+
+/** CSS for displays that will be turned on and off */
+#mainMenu {
+  position: absolute;
+  left: 0px;
+  top: 0px;
+}

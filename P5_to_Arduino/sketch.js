@@ -18,7 +18,7 @@ let predictions = [];
  * size and position of canvas + definiting the port being used to detect the arduino in use
  */
 function setup() {
-  createCanvas(300, 150);
+  createCanvas(window.innerWidth, window.innerHeight);
   frameRate(15);
   rectMode(CENTER);
   fill(0, 0, 0);
@@ -55,9 +55,8 @@ function webcamIsReady() {
  */
 function draw() {
   clear();
-  /* background(red, green, 255); */
 
-  //* receiving data from arduino */
+  //* ARDUINO */
   serialReceive();
   text("Input Line: " + latestData, 10, height - 30); // print the data to the sketch
 
@@ -71,32 +70,17 @@ function draw() {
 
   
   //* ML5 */
-  //move image by the width of image to the left
   translate(width, 0);
-  //then scale it by -1 in the x-axis
-  //to flip the image
   scale(-1, 1);
-  //draw video capture feed as image inside p5 canvas
   image(video, 0, 0, width, height);
 
-  // We can call both functions to draw all keypoints and the skeletons
   drawKeypoints();
 }
 
 /**
- * function that draws ellipses over the detected keypoints
+ * function that draws ellipses and skeletons over the detected keypoints
  */
 function drawKeypoints() {
-  // for (let i = 0; i < predictions.length; i += 1) {
-  //   const prediction = predictions[i];
-  //   for (let j = 0; j < prediction.landmarks.length; j += 1) {
-  //     const keypoint = prediction.landmarks[j];
-  //     fill(0, 255, 0);
-  //     noStroke();
-  //     circle(keypoint[0], keypoint[1], 10);
-  //   }
-  // }
-
   for (let i = 0; i < predictions.length; i += 1) {
     const prediction = predictions[i];
     for (let j = 0; j < prediction.landmarks.length; j += 1) {
@@ -123,10 +107,10 @@ function modelReady() {
  * function that receives data from arduino serial monitor
  */ 
 function serialReceive() {
-  let currentString = serial.readLine(); // store the data in a variable
+  let currentString = serial.readLine(); /* store the data from arduino's serial monitor in a variable */
   trim(currentString); // get rid of whitespace
   if (!currentString) return; // if there's nothing in there, ignore it
-  arduinoValues = split(currentString, ' ');
+  arduinoValues = split(currentString, ' '); /* creates an array with data from arduino */
   //console.log(currentString);
   latestData = currentString; // save it to the global variable
 
