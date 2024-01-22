@@ -7,6 +7,8 @@ let but1Value = 0;
 let red = 255;
 let green = 255;
 
+let joystickX;
+
 
 //* ML5 handpose webcam variables */
 let handpose;
@@ -30,12 +32,14 @@ let gameStarted = false;
 
 
 //* Game scenario variables */
+let strings = [];
+
 let lines = [1, 3, 5, 5, 7, 7, 7, 7, 5, 3, 1];
 let rectangles = [];
 let rectX = 0;
 let rectW;
 let rectH = window.innerHeight * 0.03;
-let line = 0;
+let lineRect = 0;
 let nbrRectPerLine = -1;
 let rectColor;
 let rectMarginTop;
@@ -45,7 +49,7 @@ let rectMarginTop;
  */
 function setup() {
   createCanvas(window.innerWidth, window.innerHeight);
-  frameRate(15);
+  frameRate(30);
   rectMode(CENTER);
   fill(0, 0, 0);
   
@@ -64,21 +68,22 @@ function setup() {
 
   video.hide();
 
+
   //* GAME SCENARIO */
   for (let i = 0; i < 52; i++) {
     nbrRectPerLine++
     rectX++
 
     if (i == 0) {
-      line = 1;
+      lineRect = 1;
       rectX = 0;
-    } else if (nbrRectPerLine == lines[line-1]) {
-      line++
+    } else if (nbrRectPerLine == lines[lineRect-1]) {
+      lineRect++
       nbrRectPerLine = 0
-      rectX = -Math.floor(lines[line-1] / 2)
+      rectX = -Math.floor(lines[lineRect-1] / 2)
     }
 
-    if (line <= 8) {
+    if (lineRect <= 8) {
       rectColor = '#EFCC6D'
       rectMarginTop = 0;
     } else {
@@ -107,9 +112,7 @@ function setup() {
       rectW = width*0.02;
     }
 
-    console.log(line);
-
-    rectangles.push(new Rectangle(rectX, line, rectW, rectH, rectColor, rectMarginTop));
+    rectangles.push(new Rectangle(rectX, lineRect, rectW, rectH, rectColor, rectMarginTop));
   }
 }
  
@@ -144,7 +147,7 @@ function draw() {
   if (!gameStarted && document.querySelector('#calibrationScreen').style.display != 'flex' && document.querySelector('#mainMenu').style.display == 'none') {
     gameStarted = true;
   }
-
+  
 
   //* GAME logics */
   if (gameStarted) {
@@ -156,8 +159,10 @@ function draw() {
 
 
   //* ARDUINO */
-  serialReceive();
-  text("Input Line: " + latestData, 10, height - 30); // print the data to the sketch
+  if (joyStick && gameStarted) {
+    serialReceive(); 
+    text("Input Line: " + latestData, 10, height - 30); // print the data to the sketch
+  }
 
   // in this example, we are reciving a 0 and a 1
   // if the button1 is not pressed we get a 0
@@ -250,27 +255,26 @@ function drawKeypoints() {
         }
 
         if ((!joyStick && gameStarted)) {
-          let rectangleW = width*0.1;
-          let rectangleH = 30;
-          let pinkW = rectangleW * 0.15;
 
-          stroke('#036280');
-          strokeWeight(3);
-          fill('#000');
-          smooth();
-          rect(newAverageX, height*0.9, rectangleW, rectangleH);
+          movingRect(joyStick, gameStarted, newAverageX);
+
+          // stroke('#036280');
+          // strokeWeight(3);
+          // fill('#000');
+          // smooth();
+          // rect(newAverageX, height*0.9, rectangleW, rectangleH);
           
-          noStroke();
-          fill('#FF01A4');
-          rect(newAverageX-rectangleW*0.3, height*0.9, pinkW, rectangleH*0.5);
+          // noStroke();
+          // fill('#FF01A4');
+          // rect(newAverageX-rectangleW*0.3, height*0.9, pinkW, rectangleH*0.5);
 
-          noStroke();
-          fill('#FF01A4');
-          rect(newAverageX+rectangleW*0.3, height*0.9, pinkW, rectangleH*0.5);
+          // noStroke();
+          // fill('#FF01A4');
+          // rect(newAverageX+rectangleW*0.3, height*0.9, pinkW, rectangleH*0.5);
 
-          noStroke();
-          fill('#A48A6C');
-          rect(newAverageX, height*0.9, pinkW*2, rectangleH*0.5);
+          // noStroke();
+          // fill('#A48A6C');
+          // rect(newAverageX, height*0.9, pinkW*2, rectangleH*0.5);
         }
       }
     }
@@ -323,13 +327,20 @@ function modelReady() {
 function serialReceive() {
   let currentString = serial.readLine(); /* store the data from arduino's serial monitor in a variable */
   trim(currentString); // get rid of whitespace
-  if (!currentString) return; // if there's nothing in there, ignore it
-  arduinoValues = split(currentString, ' '); /* creates an array with data from arduino */
-  //console.log(currentString);
-  latestData = currentString; // save it to the global variable
+  if (!currentString) {  // if there's nothing in arduino's serial monitor
+    movingRect(joyStick, gameStarted, joystickX);
+  } else {
+    arduinoValues = split(currentString, ' '); /* creates an array with data from arduino */
+    latestData = currentString; // save it to the global variable
 
-  red = 0; // Reset value
-  red = map(arduinoValues[0], 0, 1023, 0, 255);
+    // joystickX = map(arduinoValues[0], 0, 200, window.innerWidth*0.1, (window.innerWidth*0.9*200)/1023);
+    // joystickX = map(arduinoValues[0], 200, 800, (window.innerWidth*0.9*200)/1023, (window.innerWidth*0.9*800)/1023);
+    // joystickX = map(arduinoValues[0], 800, 1023, (window.innerWidth*0.9*800)/1023, window.innerWidth*0.9);
+
+    joystickX = map(arduinoValues[0], 0, 1023, window.innerWidth*0.1, window.innerWidth*0.9);
+    movingRect(joyStick, gameStarted, joystickX);
+  }
+
   // green = 0; // Reset value
   // green = map(arduinoValues[1], 0, 1023, 0, 255);
   but1Value = 0; // Reset value
@@ -389,16 +400,56 @@ function gotError(theerror) {
 }
 ////////////////////////////////////////////////////////////////
 
+
+function movingRect(joystick, gameStarted, rectX) {
+  let rectangleW = width*0.1;
+  let rectangleH = 30;
+  let pinkW = rectangleW * 0.15;
+
+  stroke('#036280');
+  strokeWeight(3);
+  fill('#000');
+  smooth();
+  rect(rectX, height*0.9, rectangleW, rectangleH);
+  
+  noStroke();
+  fill('#FF01A4');
+  rect(rectX-rectangleW*0.3, height*0.9, pinkW, rectangleH*0.5);
+
+  noStroke();
+  fill('#FF01A4');
+  rect(rectX+rectangleW*0.3, height*0.9, pinkW, rectangleH*0.5);
+
+  noStroke();
+  fill('#A48A6C');
+  rect(rectX, height*0.9, pinkW*2, rectangleH*0.5);
+}
+
+
+
+class Ball {
+  constructor(ballX, ballY) {
+    this.bX = ballX;
+    this.bY = ballY;
+    this.bSpeed = 3;
+    this.bAngle = createVector(this.bSpeed, -this.bSpeed);
+    this.bR = width*0.015;
+  }
+
+
+}
+
+
 class Rectangle {
-  constructor(rectX, line, rectW, rectH, rectColor, marginTop) {
+  constructor(rectX, lineRect, rectW, rectH, rectColor, marginTop) {
       // Here are assigned the initial values of properties
       this.rectX = rectX;
-      this.line = line;
+      this.lineRect = lineRect;
       this.rectW = rectW;
       this.rectH = rectH;
       this.rectColor = rectColor;
       this.marginTop = marginTop;
-      this.rectY = (this.rectH+6+marginTop)*this.line;
+      this.rectY = (this.rectH+6+marginTop)*this.lineRect;
   }
 
 
@@ -408,21 +459,19 @@ class Rectangle {
     fill('#000');
     strokeWeight(3);
     stroke(this.rectColor);
-
-    
   
     rect(width*0.5+this.rectX*rectW, height*0.1+this.rectY, this.rectW, this.rectH);
   }
 
 
   drive() { // method to move a car
-      this.posX += this.speed;
+    this.posX += this.speed;
 
-      if (this.posX < -20) {
-          this.posX = width;
-      }
-      if (this.posX > width) {
-          this.posX = -20;
-      }
+    if (this.posX < -20) {
+        this.posX = width;
+    }
+    if (this.posX > width) {
+        this.posX = -20;
+    }
   }
 }
