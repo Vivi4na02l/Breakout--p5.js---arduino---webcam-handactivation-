@@ -43,6 +43,17 @@ canvas {
   border-radius: 10px;
 }
 
+.line {
+  /* position: absolute; */
+  border-bottom-style: solid;
+  border-bottom-width: 5px;
+  border-color: white;
+}
+
+#btnReturn {
+  position: absolute;
+}
+
 
 
 /** CSS for text */
