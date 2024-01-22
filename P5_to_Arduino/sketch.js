@@ -73,6 +73,12 @@ function setup() {
   video.hide();
 
 
+  //* Non-interactive game SCENARIO */
+  for (let i = 0; i < 5; i++) {
+    strings.push(new floorString(height, height, i));
+  }
+
+
   //* GAME SCENARIO */
   for (let i = 0; i < 52; i++) {
     nbrRectPerLine++
@@ -152,6 +158,26 @@ function draw() {
   
   if (!gameStarted && document.querySelector('#calibrationScreen').style.display != 'flex' && document.querySelector('#mainMenu').style.display == 'none') {
     gameStarted = true;
+  }
+
+
+  //* Non-interactive game SCENARIO */
+  strokeWeight(3);
+  stroke('#A44EA0');
+  line(0, height*0.7, width, height*0.7);
+
+  line(0, height*0.85, width*0.1, height*0.7);
+  line(width*0.9, height*0.7, width, height*0.85);
+
+  line(width*0.21, height, width*0.3, height*0.7);
+  line(width*0.7, height*0.7, width*0.79, height);
+
+  line(width*0.5, height*0.7, width*0.5, height);
+
+  for (let i = 0; i < strings.length; i++) {
+    let string = strings[i];
+    string.draw();
+    string.moveString();
   }
   
 
@@ -470,6 +496,48 @@ function movingRect(joystick, gameStarted, rectX) {
 }
 
 
+class floorString {
+  constructor(stringY0, stringY1, stringNbr) {
+      // Here are assigned the initial values of properties
+      this.stringY0 = stringY0;
+      this.stringY1 = stringY1;
+      this.stringNbr = stringNbr;
+  }
+
+
+  draw() { /* method that draws the movable strings on the floor */
+    strokeWeight(3);
+    stroke('#A44EA0');
+
+    line(0, this.stringY0 + (300 * this.stringNbr), width, this.stringY1 + (300 * this.stringNbr));
+  }
+
+
+  moveString() { /*method to move strings vertically */
+    if (this.stringY0 <= height) {
+      this.stringY0 -= 25;
+      this.stringY1 -= 25;
+    } else if (this.stringY0 <= height*0.9) {
+      this.stringY0 -= 20;
+      this.stringY1 -= 20;
+    } else if (this.stringY0 <= height*0.85) {
+      this.stringY0 -= 15;
+      this.stringY1 -= 15;
+    } else if (this.stringY0 <= height*0.8) {
+      this.stringY0 -= 10;
+      this.stringY1 -= 10;
+    } else if (this.stringY0 <= height*0.75) {
+      this.stringY0 -= 5;
+      this.stringY1 -= 5;
+    }
+
+    if (this.stringY0 <= height*0.7) {
+      this.stringY0 = height;
+      this.stringY1 = height;
+    }
+  }
+}
+
 
 class Ball {
   constructor(x, y) {
@@ -496,15 +564,6 @@ class Ball {
   }
 
   collides(rectangle) {
-    // let closestX = constrain(this.bPos.x, rectangle.rectX - rectangle.rectW / 2, rectangle.rectX + rectangle.rectW / 2);
-    // let closestY = constrain(this.bPos.y, rectangle.rectY - rectangle.rectH / 2, rectangle.rectY + rectangle.rectH / 2);
-
-    // let distanceX = this.bPos.x - closestX;
-    // let distanceY = this.bPos.y - closestY;
-    // let distanceSquared = (distanceX * distanceX) + (distanceY * distanceY);
-
-    // return distanceSquared < (this.bR * this.bR);
-
     if (this.bPos.x + this.bR >= rectangle.rectX
       //NOT to the left
       &&
@@ -521,26 +580,6 @@ class Ball {
       return true;
     }
   }
-
-
-
-    // if (this.x + this.bR < rectangle.rectX + rectangle.rectW / 2) {
-    //   console.log('1');
-    //   return false;
-    // } else if (this.x - this.bR > rectangle.rectX + rectangle.rectW / 2) {
-    //   console.log('2');
-    //   return false;
-    // } else if (this.y + this.bR < rectangle.rectY - rectangle.rectH / 2) {
-    //   console.log('3');
-    //   return false;
-    // } else if (this.y - this.bR > rectangle.rectY + rectangle.rectH / 2) {
-    //   console.log('4');
-    //   return false;
-    // } else {
-    //   console.log('wha');
-    //   return true;
-    // }
-  // }
 
   afterRectangle(rectangle) {
     this.bAngle.x *= -1;
