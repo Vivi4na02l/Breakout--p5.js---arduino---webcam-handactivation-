@@ -459,6 +459,11 @@ function keyPressed() {
 }
 
 
+// function stars() {
+  
+// }
+
+
 function movingRect(joystick, gameStarted, rectX) {
   let rectangleW = width*0.1;
   let rectangleH = 30;
