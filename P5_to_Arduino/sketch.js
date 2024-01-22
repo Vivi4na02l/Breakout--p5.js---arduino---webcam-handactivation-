@@ -145,6 +145,7 @@ function draw() {
   noSmooth();
   strokeWeight(1);
   noStroke();
+  stars();
 
   //* PRE-GAME logics */
   if (!gameStarted) {
@@ -460,9 +461,16 @@ function keyPressed() {
 
 
 function stars() {
-  let randomNum3 = random(width, height); 
+  fill('#ffffff15')
+  let randomX, randomH, randomSize;
 
+  for (let i = 0; i < 20; i++) {
+    randomX = random(0, width);
+    randomH = random(0, height);
+    randomSize = random(width*0.001, width*0.005)
 
+    ellipse(randomX, randomH, randomSize, randomSize);
+  }
 }
 
 
