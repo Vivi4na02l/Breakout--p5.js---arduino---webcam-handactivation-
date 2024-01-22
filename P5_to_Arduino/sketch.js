@@ -135,7 +135,7 @@ function webcamIsReady() {
   dims.videoWidth = video.width, dims.videoHeight = video.height
 }
 
-
+/* random line to say made by: Viviana :) */
 
 /**
  * draw function
@@ -459,9 +459,11 @@ function keyPressed() {
 }
 
 
-// function stars() {
-  
-// }
+function stars() {
+  let randomNum3 = random(width, height); 
+
+
+}
 
 
 function movingRect(joystick, gameStarted, rectX) {
@@ -606,8 +608,10 @@ class Ball {
       this.bAngle.y *= -1;
     }
     
-    else if (this.bPos.y + this.bR > height*0.95) {
-      this.bAngle.y *= -1;
+    if (this.bPos.y + this.bR > height*0.95) {
+      // this.bAngle.y *= -1;
+      noLoop();
+      document.querySelector('#gameOver').style.display = 'flex';
     }
   }
 }

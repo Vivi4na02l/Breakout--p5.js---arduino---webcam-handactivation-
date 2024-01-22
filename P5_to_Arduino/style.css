@@ -88,12 +88,12 @@ h1 {
 
 
 /** CSS for displays that will be turned on and off */
-#mainMenu, #calibrationScreen {
+#mainMenu, #calibrationScreen, #gameOver {
   position: absolute;
   left: 0px;
   top: 0px;
 }
 
-#calibrationScreen {
+#calibrationScreen, #gameOver {
   display: none;
 }

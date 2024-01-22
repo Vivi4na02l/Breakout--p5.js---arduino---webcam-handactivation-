@@ -29,6 +29,9 @@ document.querySelector('#btnReturn').style.height = window.innerWidth*0.025 + 'p
 document.querySelector('#btnReturn').style.left = window.innerWidth*0.025 + 'px';
 document.querySelector('#btnReturn').style.top = window.innerWidth*0.025 + 'px';
 
+/* dimensions for GAME OVER div */
+document.querySelector('#gameOver').style.width = window.innerWidth + 'px';
+document.querySelector('#gameOver').style.height = window.innerHeight + 'px';
 
 
 //* event listener for buttons */
