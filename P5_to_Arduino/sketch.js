@@ -16,6 +16,7 @@ let video;
 let predictions = [];
 let dims = {};
 let averageX = 0;
+let newAverageX;
 let handSkeletonColor = "#FFFF00"
 
 
@@ -36,7 +37,7 @@ let strings = [];
 
 let lines = [1, 3, 5, 5, 7, 7, 7, 7, 5, 3, 1];
 let rectangles = [];
-let rectX = 0;
+let rectNbr = 0;
 let rectW;
 let rectH = window.innerHeight * 0.03;
 let lineRect = 0;
@@ -44,6 +45,7 @@ let nbrRectPerLine = -1;
 let rectColor;
 let rectMarginTop;
 
+let balls = [];
 let isBallOut = false;
 
 /**
@@ -74,15 +76,15 @@ function setup() {
   //* GAME SCENARIO */
   for (let i = 0; i < 52; i++) {
     nbrRectPerLine++
-    rectX++
+    rectNbr++
 
     if (i == 0) {
       lineRect = 1;
-      rectX = 0;
+      rectNbr = 0;
     } else if (nbrRectPerLine == lines[lineRect-1]) {
       lineRect++
       nbrRectPerLine = 0
-      rectX = -Math.floor(lines[lineRect-1] / 2)
+      rectNbr = -Math.floor(lines[lineRect-1] / 2)
     }
 
     if (lineRect <= 8) {
@@ -110,12 +112,16 @@ function setup() {
 
     if (!isSmallRect) {
       rectW = width*0.035;
-    } else {
-      rectW = width*0.02;
     }
+    // else {
+    //   rectW = width*0.02;
+    // }
+    
 
-    rectangles.push(new Rectangle(rectX, lineRect, rectW, rectH, rectColor, rectMarginTop));
+    rectangles.push(new Rectangle(width*0.5+rectNbr*rectW, lineRect, rectW, rectH, rectColor, rectMarginTop));
   }
+
+  balls.push(new Ball(window.innerWidth*0.5, height*0.85));
 }
  
 function webcamIsReady() {
@@ -151,9 +157,44 @@ function draw() {
 
   //* GAME logics */
   if (gameStarted) {
+    /** Draw rectangle sun */
     for (let i = 0; i < rectangles.length; i++) {
       let rectangle = rectangles[i];
       rectangle.draw();
+    }
+
+    /** Draw ball */
+    if (!isBallOut) {
+      for (let i = 0; i < balls.length; i++) {
+        let ball = balls[i];
+        ball.render();
+      }
+    } else {
+      for (let i = 0; i < balls.length; i++) {
+        let ball = balls[i];
+        ball.draw();
+      }
+
+      /** Detects collision between ball and rectangles */
+      for (let i = 0; i < balls.length; i++) {
+        let ball = balls[i];
+
+        for (let i = 0; i < rectangles.length; i++) {
+          let rectangle = rectangles[i];
+
+          if (ball.collides(rectangle)) {
+            ball.afterRectangle(rectangle);
+            console.log('ball-x: '+ball.bPos.x+', rect-x: '+rectangle.rectX);
+            rectangles.splice(i, 1);
+          }
+        }
+      }
+
+      for (let i = 0; i < balls.length; i++) {
+        let ball = balls[i];
+
+        ball.afterBorder();
+      }
     }
   }
 
@@ -212,7 +253,8 @@ function drawKeypoints() {
       // only draws rectangle if the player chose the HAND DETECTION and if he is on the "play" screen
       if (j == prediction.landmarks.length-1) {
         averageX = averageX / prediction.landmarks.length;
-        let newAverageX = map(averageX, 0, dims.videoWidth, 0, dims.canvasWidth)
+        // let newAverageX = map(averageX, 0, dims.videoWidth, 0, dims.canvasWidth)
+        newAverageX = map(averageX, 0, dims.videoWidth, 0, width);
 
         if (calibration) {
           if (newAverageX < width*0.8 && newAverageX > width*0.6) {
@@ -254,12 +296,15 @@ function drawKeypoints() {
           }
         }
 
-        if ((!joyStick && gameStarted)) {
-
-          movingRect(joyStick, gameStarted, newAverageX);
-        }
+        // if ((!joyStick && gameStarted)) {
+        //   movingRect(joyStick, gameStarted, newAverageX);
+        // }
       }
     }
+  }
+
+  if ((!joyStick && gameStarted)) {
+    movingRect(joyStick, gameStarted, newAverageX);
   }
 
   if (calibration) {  
@@ -319,7 +364,7 @@ function serialReceive() {
     // joystickX = map(arduinoValues[0], 200, 800, (window.innerWidth*0.9*200)/1023, (window.innerWidth*0.9*800)/1023);
     // joystickX = map(arduinoValues[0], 800, 1023, (window.innerWidth*0.9*800)/1023, window.innerWidth*0.9);
 
-    joystickX = map(arduinoValues[0], 0, 1023, window.innerWidth*0.1, window.innerWidth*0.9);
+    joystickX = map(arduinoValues[0], 0, 1023, window.innerWidth*0.05, window.innerWidth*0.95);
     movingRect(joyStick, gameStarted, joystickX);
   }
 
@@ -414,33 +459,127 @@ function movingRect(joystick, gameStarted, rectX) {
   noStroke();
   fill('#A48A6C');
   rect(rectX, height*0.9, pinkW*2, rectangleH*0.5);
+
+  for (let i = 0; i < balls.length; i++) {
+    let ball = balls[i];
+    if (ball.bPos.x > rectX - rectangleW / 2 && ball.bPos.x < rectX + rectangleW / 2 && ball.bPos.y + ball.bR > (height*0.9) - rectangleH / 2 && ball.bPos.y < height*0.9) {
+      let newAngleX = map(ball.bPos.x, rectX - rectangleW / 2, rectX + rectangleW / 2, -1, 1);
+      ball.bAngle.set(newAngleX * ball.bSpeed, -ball.bSpeed);
+    }
+  }
 }
 
 
 
 class Ball {
-  constructor(ballX, ballY) {
-    this.bX = ballX;
-    this.bY = ballY;
-    this.bSpeed = 3;
+  constructor(x, y) {
+    this.bPos = createVector(x, y);
+    this.bSpeed = 15;
     this.bAngle = createVector(this.bSpeed, -this.bSpeed);
     this.bR = width*0.015;
   }
 
+  render() {
+    fill('#fff');
+    noStroke();
+  
+    ellipse(this.bPos.x, this.bPos.y, this.bR, this.bR);
+  }
 
+  draw() {
+    fill('#fff');
+    noStroke();
+
+    this.bPos.add(this.bAngle);
+  
+    ellipse(this.bPos.x, this.bPos.y, this.bR, this.bR);
+  }
+
+  collides(rectangle) {
+    // let closestX = constrain(this.bPos.x, rectangle.rectX - rectangle.rectW / 2, rectangle.rectX + rectangle.rectW / 2);
+    // let closestY = constrain(this.bPos.y, rectangle.rectY - rectangle.rectH / 2, rectangle.rectY + rectangle.rectH / 2);
+
+    // let distanceX = this.bPos.x - closestX;
+    // let distanceY = this.bPos.y - closestY;
+    // let distanceSquared = (distanceX * distanceX) + (distanceY * distanceY);
+
+    // return distanceSquared < (this.bR * this.bR);
+
+    if (this.bPos.x + this.bR >= rectangle.rectX
+      //NOT to the left
+      &&
+      this.bPos.x <= rectangle.rectX + rectangle.rectW
+      //NOT to the right
+      &&
+      this.bPos.y + this.bR >= rectangle.rectY
+      //NOT above
+      &&
+      this.bPos.y <= rectangle.rectY + rectangle.rectH) {
+      //NOT below
+
+      /* they collide! */
+      return true;
+    }
+  }
+
+
+
+    // if (this.x + this.bR < rectangle.rectX + rectangle.rectW / 2) {
+    //   console.log('1');
+    //   return false;
+    // } else if (this.x - this.bR > rectangle.rectX + rectangle.rectW / 2) {
+    //   console.log('2');
+    //   return false;
+    // } else if (this.y + this.bR < rectangle.rectY - rectangle.rectH / 2) {
+    //   console.log('3');
+    //   return false;
+    // } else if (this.y - this.bR > rectangle.rectY + rectangle.rectH / 2) {
+    //   console.log('4');
+    //   return false;
+    // } else {
+    //   console.log('wha');
+    //   return true;
+    // }
+  // }
+
+  afterRectangle(rectangle) {
+    this.bAngle.x *= -1;
+    this.bAngle.y *= -1;
+    this.draw();
+
+    // if (ball.collides(rectangle)) {
+    //   this.vel.x *= -1;
+    //   this.vel.y *= -1;
+    // }
+  }
+
+  afterBorder() {
+    if (this.bPos.x + this.bR > window.innerWidth) {
+      this.bAngle.x *= -1;
+    } else if (this.bPos.x + this.bR < window.innerWidth*0.01) {
+      this.bAngle.x *= -1;
+    } else if (this.bPos.y + this.bR < height*0.05) {
+      this.bAngle.y *= -1;
+    }
+    
+    else if (this.bPos.y + this.bR > height*0.95) {
+      this.bAngle.y *= -1;
+    }
+  }
 }
 
 
 class Rectangle {
   constructor(rectX, lineRect, rectW, rectH, rectColor, marginTop) {
       // Here are assigned the initial values of properties
+      // this.rectX0 = width*0.5
       this.rectX = rectX;
       this.lineRect = lineRect;
       this.rectW = rectW;
       this.rectH = rectH;
       this.rectColor = rectColor;
       this.marginTop = marginTop;
-      this.rectY = (this.rectH+6+marginTop)*this.lineRect;
+      this.rectY = height*0.1+(this.rectH+6+marginTop)*this.lineRect;
   }
 
 
@@ -451,7 +590,7 @@ class Rectangle {
     strokeWeight(3);
     stroke(this.rectColor);
   
-    rect(width*0.5+this.rectX*rectW, height*0.1+this.rectY, this.rectW, this.rectH);
+    rect(this.rectX, this.rectY, this.rectW, this.rectH);
   }
 
 

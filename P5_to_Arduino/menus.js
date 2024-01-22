@@ -3,6 +3,13 @@
 document.querySelector('#mainMenu').style.width = window.innerWidth + 'px';
 document.querySelector('#mainMenu').style.height = window.innerHeight + 'px';
 
+/* dimensions for bgVaperwave */
+document.querySelector('#bgVaperwave').style.width = window.innerWidth + 'px';
+document.querySelector('#bgVaperwave').style.height = window.innerHeight*0.3 + 'px';
+document.querySelector('#srcBg').style.width = window.innerWidth + 'px';
+document.querySelector('#srcBg').style.height = window.innerHeight*0.3 + 'px';
+document.querySelector('#bgVaperwave').style.top = window.innerHeight*0.7 + 'px';
+
 /* dimensions for calibrationScreen div */
 document.querySelector('#calibrationScreen').style.width = window.innerWidth + 'px';
 document.querySelector('#calibrationScreen').style.height = window.innerHeight*0.3 + 'px';
