@@ -39,8 +39,16 @@ document.querySelector('#btnPlay').addEventListener('click', e => {
 
 /* clicking on the hand button will show the player the hand calibration screen */
 document.querySelector('#btnHand').addEventListener('click', e => {
-    document.querySelector('#mainMenu').style.display = 'none';
-    document.querySelector('#calibrationScreen').style.display = 'flex';
+    if (!document.querySelector('#btnHand').classList.contains("active")) {
+        document.querySelector('#mainMenu').style.display = 'none';
+        document.querySelector('#calibrationScreen').style.display = 'flex';
+    }
+})
+
+/* clicking on the joystick button will reset any progress of calibration that the player might have done before */
+document.querySelector('#btnJoystick').addEventListener('click', e => {
+    document.querySelector('#btnJoystick').classList.add("active");
+    document.querySelector('#btnHand').classList.remove("active");
 })
 
 /* clicking on the return button will take the player back to the main menu */

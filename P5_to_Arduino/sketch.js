@@ -14,7 +14,19 @@ let video;
 let predictions = [];
 let dims = {};
 let averageX = 0;
+let handSkeletonColor = "#FFFF00"
 
+
+//* Code logic variables */
+let ms;
+let calibration = false;
+let calibrationDone = false;
+let msLeftStarted, msRightStarted;
+let lineLeftColor = '#FFFF00', lineRightColor = '#FFFF00';
+let timerLeftStarted = false, timerRightStarted = false;
+let lineLeftChecked = false, lineRightChecked = false;
+let joyStick = true;
+let gameStarted = false;
 
 /**
  * size and position of canvas + definiting the port being used to detect the arduino in use
@@ -56,6 +68,19 @@ function webcamIsReady() {
 function draw() {
   clear();
 
+  if (!gameStarted) {
+    if (document.querySelector('#calibrationScreen').style.display == 'flex') {
+      calibration = true;
+      ms = millis();
+    } else {
+      calibration = false
+    }
+
+    // if (document.querySelector('#btnJoystick').classList.contains("active")) {
+      
+    // }
+  }
+
   //* ARDUINO */
   serialReceive();
   text("Input Line: " + latestData, 10, height - 30); // print the data to the sketch
@@ -72,17 +97,14 @@ function draw() {
   //* ML5 */
   translate(width, 0);
   scale(-1, 1); /* inverts canvas so that the webcam hand captation mechanic is less confusion for the player */
-  if (document.querySelector('#calibrationScreen').style.display == 'flex') {
+  if (calibration) {
     tint(255, 51);
     image(video, 0, 0, width, height);
-
-    noStroke();
-    fill('#fff');
-    rect(width*0.8,height*0.9, width*0.2, 10); /* since the canvas is inverted horizontally, the X coords would originally be: width * 0.2 */
-    rect(width*0.2,height*0.9, width*0.2, 10); /* since the canvas is inverted horizontally, the X coords would originally be: width * 0.8 */
   }
 
-  drawKeypoints();
+  if (calibration || (!joyStick && gameStarted)) {
+    drawKeypoints();
+  }
 }
 
 /**
@@ -98,17 +120,98 @@ function drawKeypoints() {
  
       let newX = map(keypoint[0], 0, dims.videoWidth, 0, dims.canvasWidth)
       let newY = map(keypoint[1], 0, dims.videoHeight, 0, dims.canvasHeight)
-      fill(255, 255, 0);
-      noStroke();
-      circle(newX, newY, 10);
+
+      // only shows the circles of the hand-skeleton when in the calibration screen
+      if (calibration) {
+        fill(handSkeletonColor);
+        noStroke();
+        circle(newX, newY, 10);
+      }
       
       averageX += keypoint[0]
 
+      // only draws rectangle if the player chose the HAND DETECTION and if he is on the "play" screen
       if (j == prediction.landmarks.length-1) {
         averageX = averageX / prediction.landmarks.length;
         let newAverageX = map(averageX, 0, dims.videoWidth, 0, dims.canvasWidth)
-        rect(newAverageX, height*0.9, width*0.1, 30);
+
+        if (calibration) {
+          if (newAverageX < width*0.8 && newAverageX > width*0.6) {
+            handSkeletonColor = '#00FF00';
+            lineLeftColor = '#00FF00';
+            
+            if (!timerLeftStarted) {
+              timerLeftStarted = true
+              msLeftStarted = ms;
+            }
+
+            if (ms - msLeftStarted > 1000) {
+              lineLeftChecked = true  
+            }
+          } else if (newAverageX < width*0.4 && newAverageX > width*0.2) {
+            handSkeletonColor = '#00FF00';
+            lineRightColor = '#00FF00';
+            
+            if (!timerRightStarted) {
+              timerRightStarted = true
+              msRightStarted = ms;
+            }
+
+            if (ms - msRightStarted > 1000) {
+              lineRightChecked = true  
+            }
+          } else {
+            handSkeletonColor = '#FFFF00'
+
+            if (!lineLeftChecked) {
+              lineLeftColor = '#FFFF00';
+              timerLeftStarted = false; 
+            }
+
+            if (!lineRightChecked) {
+              lineRightColor = '#FFFF00';
+              timerRightStarted = false;
+            }
+          }
+        }
+
+        if ((!joyStick && gameStarted)) {
+          rect(newAverageX, height*0.9, width*0.1, 30);
+        }
       }
+    }
+  }
+
+  if (calibration) {  
+    noStroke();
+    fill(lineLeftColor);
+
+    if (!lineLeftChecked) {
+      rect(width*0.8,height*0.9, width*0.2, 10); /* since the canvas is inverted horizontally, the X coords would originally be: width * 0.2 */ 
+    }
+
+    fill(lineRightColor);
+    if (!lineRightChecked) {
+      rect(width*0.2,height*0.9, width*0.2, 10); /* since the canvas is inverted horizontally, the X coords would originally be: width * 0.8 */
+    }
+    
+    if (lineLeftChecked && lineRightChecked && !calibrationDone && document.querySelector('#btnJoystick').classList.contains("active")) {
+      calibrationDone = true;
+      document.querySelector('#mainMenu').style.display = 'flex';
+      document.querySelector('#calibrationScreen').style.display = 'none';
+      document.querySelector('#btnHand').classList.add("active");
+      document.querySelector('#btnJoystick').classList.remove("active");
+
+    } else if (lineLeftChecked && lineRightChecked && calibrationDone && document.querySelector('#btnJoystick').classList.contains("active")) {
+      calibrationDone = false;
+
+      lineLeftChecked = false;
+      timerLeftStarted = false;
+      lineLeftColor = '#FFFF00';
+
+      lineRightChecked = false;
+      timerRightStarted = false;
+      lineRightColor = '#FFFF00';
     }
   }
 }
