@@ -28,6 +28,18 @@ let lineLeftChecked = false, lineRightChecked = false;
 let joyStick = true;
 let gameStarted = false;
 
+
+//* Game scenario variables */
+let lines = [1, 3, 5, 5, 7, 7, 7, 7, 5, 3, 1];
+let rectangles = [];
+let rectX = 0;
+let rectW;
+let rectH = window.innerHeight * 0.03;
+let line = 0;
+let nbrRectPerLine = -1;
+let rectColor;
+let rectMarginTop;
+
 /**
  * size and position of canvas + definiting the port being used to detect the arduino in use
  */
@@ -51,6 +63,54 @@ function setup() {
   });
 
   video.hide();
+
+  //* GAME SCENARIO */
+  for (let i = 0; i < 52; i++) {
+    nbrRectPerLine++
+    rectX++
+
+    if (i == 0) {
+      line = 1;
+      rectX = 0;
+    } else if (nbrRectPerLine == lines[line-1]) {
+      line++
+      nbrRectPerLine = 0
+      rectX = -Math.floor(lines[line-1] / 2)
+    }
+
+    if (line <= 8) {
+      rectColor = '#EFCC6D'
+      rectMarginTop = 0;
+    } else {
+      rectColor = '#A44EA0'
+      rectMarginTop = height*0.005;
+    }
+
+    let smallRect = 15;
+    let isSmallRect = false;
+    for (let j = 0; j < 8; j++) {
+      if (i+1 == smallRect) {
+        width*0.025
+        isSmallRect = true;
+      }
+
+      if (j % 2 == 0) {
+        smallRect += 6
+      } else {
+        smallRect += 1
+      }
+    }
+
+    if (!isSmallRect) {
+      rectW = width*0.035;
+    } else {
+      rectW = width*0.02;
+    }
+
+    console.log(line);
+
+    rectangles.push(new Rectangle(rectX, line, rectW, rectH, rectColor, rectMarginTop));
+  }
 }
  
 function webcamIsReady() {
@@ -71,6 +131,7 @@ function draw() {
   strokeWeight(1);
   noStroke();
 
+  //* PRE-GAME logics */
   if (!gameStarted) {
     if (document.querySelector('#calibrationScreen').style.display == 'flex') {
       calibration = true;
@@ -79,10 +140,20 @@ function draw() {
       calibration = false
     }
   }
-
-  if (document.querySelector('#calibrationScreen').style.display == 'none' && document.querySelector('#mainMenu').style.display == 'none') {
+  
+  if (!gameStarted && document.querySelector('#calibrationScreen').style.display != 'flex' && document.querySelector('#mainMenu').style.display == 'none') {
     gameStarted = true;
   }
+
+
+  //* GAME logics */
+  if (gameStarted) {
+    for (let i = 0; i < rectangles.length; i++) {
+      let rectangle = rectangles[i];
+      rectangle.draw();
+    }
+  }
+
 
   //* ARDUINO */
   serialReceive();
@@ -317,3 +388,41 @@ function gotError(theerror) {
   console.log(theerror);
 }
 ////////////////////////////////////////////////////////////////
+
+class Rectangle {
+  constructor(rectX, line, rectW, rectH, rectColor, marginTop) {
+      // Here are assigned the initial values of properties
+      this.rectX = rectX;
+      this.line = line;
+      this.rectW = rectW;
+      this.rectH = rectH;
+      this.rectColor = rectColor;
+      this.marginTop = marginTop;
+      this.rectY = (this.rectH+6+marginTop)*this.line;
+  }
+
+
+  draw() { /* method that draws the rectangles in shape of the sun */
+    // [1, 3, 5, 5, 7, 7, 7, 7, 5, 4, 1];
+
+    fill('#000');
+    strokeWeight(3);
+    stroke(this.rectColor);
+
+    
+  
+    rect(width*0.5+this.rectX*rectW, height*0.1+this.rectY, this.rectW, this.rectH);
+  }
+
+
+  drive() { // method to move a car
+      this.posX += this.speed;
+
+      if (this.posX < -20) {
+          this.posX = width;
+      }
+      if (this.posX > width) {
+          this.posX = -20;
+      }
+  }
+}
