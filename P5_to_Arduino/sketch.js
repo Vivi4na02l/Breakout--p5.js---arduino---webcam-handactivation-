@@ -75,10 +75,10 @@ function draw() {
     } else {
       calibration = false
     }
+  }
 
-    // if (document.querySelector('#btnJoystick').classList.contains("active")) {
-      
-    // }
+  if (document.querySelector('#calibrationScreen').style.display == 'none' && document.querySelector('#mainMenu').style.display == 'none') {
+    gameStarted = true;
   }
 
   //* ARDUINO */
@@ -197,6 +197,7 @@ function drawKeypoints() {
     
     if (lineLeftChecked && lineRightChecked && !calibrationDone && document.querySelector('#btnJoystick').classList.contains("active")) {
       calibrationDone = true;
+      joyStick = false;
       document.querySelector('#mainMenu').style.display = 'flex';
       document.querySelector('#calibrationScreen').style.display = 'none';
       document.querySelector('#btnHand').classList.add("active");
@@ -204,6 +205,7 @@ function drawKeypoints() {
 
     } else if (lineLeftChecked && lineRightChecked && calibrationDone && document.querySelector('#btnJoystick').classList.contains("active")) {
       calibrationDone = false;
+      joyStick = true;
 
       lineLeftChecked = false;
       timerLeftStarted = false;
