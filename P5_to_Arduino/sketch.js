@@ -44,6 +44,8 @@ let nbrRectPerLine = -1;
 let rectColor;
 let rectMarginTop;
 
+let isBallOut = false;
+
 /**
  * size and position of canvas + definiting the port being used to detect the arduino in use
  */
@@ -117,8 +119,6 @@ function setup() {
 }
  
 function webcamIsReady() {
-  // resizeCanvas(window.innerWidth, window.innerHeight) // redimensiona o Canvas para ter o mesmo do video
-
   dims.canvasWidth = window.innerWidth, dims.canvasHeight = window.innerHeight
   dims.videoWidth = video.width, dims.videoHeight = video.height
 }
@@ -257,24 +257,6 @@ function drawKeypoints() {
         if ((!joyStick && gameStarted)) {
 
           movingRect(joyStick, gameStarted, newAverageX);
-
-          // stroke('#036280');
-          // strokeWeight(3);
-          // fill('#000');
-          // smooth();
-          // rect(newAverageX, height*0.9, rectangleW, rectangleH);
-          
-          // noStroke();
-          // fill('#FF01A4');
-          // rect(newAverageX-rectangleW*0.3, height*0.9, pinkW, rectangleH*0.5);
-
-          // noStroke();
-          // fill('#FF01A4');
-          // rect(newAverageX+rectangleW*0.3, height*0.9, pinkW, rectangleH*0.5);
-
-          // noStroke();
-          // fill('#A48A6C');
-          // rect(newAverageX, height*0.9, pinkW*2, rectangleH*0.5);
         }
       }
     }
@@ -341,8 +323,6 @@ function serialReceive() {
     movingRect(joyStick, gameStarted, joystickX);
   }
 
-  // green = 0; // Reset value
-  // green = map(arduinoValues[1], 0, 1023, 0, 255);
   but1Value = 0; // Reset value
   but1Value = arduinoValues[1];
 }
@@ -401,10 +381,21 @@ function gotError(theerror) {
 ////////////////////////////////////////////////////////////////
 
 
+function keyPressed() {
+  if (key === ' ') {
+    isBallOut = true;
+  }
+}
+
+
 function movingRect(joystick, gameStarted, rectX) {
   let rectangleW = width*0.1;
   let rectangleH = 30;
   let pinkW = rectangleW * 0.15;
+
+  if (!isBallOut) {
+    rectX = window.innerWidth * 0.5;
+  }
 
   stroke('#036280');
   strokeWeight(3);
