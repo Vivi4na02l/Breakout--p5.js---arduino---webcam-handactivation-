@@ -13,6 +13,7 @@ let handpose;
 let video;
 let predictions = [];
 let dims = {};
+let averageX = 0;
 
 
 /**
@@ -41,7 +42,7 @@ function setup() {
 }
  
 function webcamIsReady() {
-  resizeCanvas(window.innerWidth, window.innerHeight) // redimensiona o Canvas para ter o mesmo do video
+  // resizeCanvas(window.innerWidth, window.innerHeight) // redimensiona o Canvas para ter o mesmo do video
 
   dims.canvasWidth = window.innerWidth, dims.canvasHeight = window.innerHeight
   dims.videoWidth = video.width, dims.videoHeight = video.height
@@ -71,9 +72,14 @@ function draw() {
   //* ML5 */
   if (document.querySelector('#calibrationScreen').style.display == 'flex') {
     translate(width, 0);
-    scale(-1, 1);
+    scale(-1, 1); /* inverts canvas so that the webcam hand captation mechanic is less confusion for the player */
     tint(255, 51);
-    image(video, 0, 0, width, height); 
+    image(video, 0, 0, width, height);
+
+    noStroke();
+    fill('#fff');
+    rect(width*0.8,height*0.9, width*0.2, 10); /* since the canvas is inverted horizontally, the X coords would originally be: width * 0.2 */
+    rect(width*0.2,height*0.9, width*0.2, 10); /* since the canvas is inverted horizontally, the X coords would originally be: width * 0.8 */
   }
 
   drawKeypoints();
@@ -84,18 +90,25 @@ function draw() {
  */
 function drawKeypoints() {
   for (let i = 0; i < predictions.length; i += 1) {
-    const prediction = predictions[i];
+    const prediction = predictions[i]; /* coords for every circle on every finger */
+    averageX = 0;
+
     for (let j = 0; j < prediction.landmarks.length; j += 1) {
-      const keypoint = prediction.landmarks[j];
-      // fill(0, 255, 0);
-      // noStroke();
-      // circle(keypoint[0], keypoint[1], 10);
+      const keypoint = prediction.landmarks[j]; /* coords for every each circle */
  
-      fill(255, 255, 0);
-      noStroke();
       let newX = map(keypoint[0], 0, dims.videoWidth, 0, dims.canvasWidth)
       let newY = map(keypoint[1], 0, dims.videoHeight, 0, dims.canvasHeight)
+      fill(255, 255, 0);
+      noStroke();
       circle(newX, newY, 10);
+      
+      averageX += keypoint[0]
+
+      if (j == prediction.landmarks.length-1) {
+        averageX = averageX / prediction.landmarks.length;
+        let newAverageX = map(averageX, 0, dims.videoWidth, 0, dims.canvasWidth)
+        rect(newAverageX, height*0.9, width*0.1, 30);
+      }
     }
   }
 }
