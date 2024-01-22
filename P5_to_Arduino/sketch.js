@@ -1,6 +1,6 @@
 //* Arduino variables */
-let serial; // variable for the serial object
-let latestData = "waiting for data"; // variable to hold the data
+let serial; /* variable for the serial object */
+let latestData = "waiting for data"; /* variable to hold the data */
 let arduinoValues;
 
 let but1Value = 0;
@@ -12,6 +12,7 @@ let green = 255;
 let handpose;
 let video;
 let predictions = [];
+let dims = {};
 
 
 /**
@@ -38,8 +39,6 @@ function setup() {
 
   video.hide();
 }
-
-let dims = {};
  
 function webcamIsReady() {
   resizeCanvas(window.innerWidth, window.innerHeight) // redimensiona o Canvas para ter o mesmo do video
@@ -70,9 +69,12 @@ function draw() {
 
   
   //* ML5 */
-  translate(width, 0);
-  scale(-1, 1);
-  image(video, 0, 0, width, height);
+  if (document.querySelector('#calibrationScreen').style.display == 'flex') {
+    translate(width, 0);
+    scale(-1, 1);
+    tint(255, 51);
+    image(video, 0, 0, width, height); 
+  }
 
   drawKeypoints();
 }
@@ -85,9 +87,9 @@ function drawKeypoints() {
     const prediction = predictions[i];
     for (let j = 0; j < prediction.landmarks.length; j += 1) {
       const keypoint = prediction.landmarks[j];
-      fill(0, 255, 0);
-      noStroke();
-      circle(keypoint[0], keypoint[1], 10);
+      // fill(0, 255, 0);
+      // noStroke();
+      // circle(keypoint[0], keypoint[1], 10);
  
       fill(255, 255, 0);
       noStroke();

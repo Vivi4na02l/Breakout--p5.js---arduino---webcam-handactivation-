@@ -47,14 +47,10 @@ document.querySelector('#btnPlay').addEventListener('click', e => {
 document.querySelector('#btnHand').addEventListener('click', e => {
     document.querySelector('#mainMenu').style.display = 'none';
     document.querySelector('#calibrationScreen').style.display = 'flex';
-
-
 })
 
 /* clicking on the return button will take the player back to the main menu */
 document.querySelector('#btnReturn').addEventListener('click', e => {
     document.querySelector('#mainMenu').style.display = 'flex';
     document.querySelector('#calibrationScreen').style.display = 'none';
-
-    
 })
