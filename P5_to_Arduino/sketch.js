@@ -67,6 +67,9 @@ function webcamIsReady() {
  */
 function draw() {
   clear();
+  noSmooth();
+  strokeWeight(1);
+  noStroke();
 
   if (!gameStarted) {
     if (document.querySelector('#calibrationScreen').style.display == 'flex') {
@@ -176,7 +179,28 @@ function drawKeypoints() {
         }
 
         if ((!joyStick && gameStarted)) {
-          rect(newAverageX, height*0.9, width*0.1, 30);
+          let rectangleW = width*0.1;
+          let rectangleH = 30;
+          let pinkW = rectangleW * 0.15;
+
+          drawShadowRect(100, 100, 200, 100, 10);
+          stroke('#036280');
+          strokeWeight(3);
+          fill('#000');
+          smooth();
+          rect(newAverageX, height*0.9, rectangleW, rectangleH);
+          
+          noStroke();
+          fill('#FF01A4');
+          rect(newAverageX-rectangleW*0.3, height*0.9, pinkW, rectangleH*0.5);
+
+          noStroke();
+          fill('#FF01A4');
+          rect(newAverageX+rectangleW*0.3, height*0.9, pinkW, rectangleH*0.5);
+
+          noStroke();
+          fill('#A48A6C');
+          rect(newAverageX, height*0.9, pinkW*2, rectangleH*0.5);
         }
       }
     }
