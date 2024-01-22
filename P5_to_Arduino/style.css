@@ -1,7 +1,7 @@
 html, body {
   margin: 0;
   padding: 0;
-  background-color: #000;
+  background: linear-gradient(#1c1348, #0b0623);
 }
 canvas {
   display: block;
@@ -34,14 +34,37 @@ canvas {
 
 
 /** CSS of buttons */
-.btnPlus {
+.btn {
   cursor: pointer;
 
   border-style: solid;
   border-width: 2px;
-  border-color: white;
-  background-color: #8A54B1;
+  border-color: #000;
+  background-color: #000;
   border-radius: 10px;
+
+  box-shadow: 0px 0px 20px 5px #000;
+
+  color: #fff;             
+} .active p {
+  text-shadow: #2f97ffc4 5px 0px 5px,
+               #2f97ffc4 -5px 0px 5px,
+               #2f97ffc4 0px 5px 5px,
+               #2f97ffc4 0px -5px 5px;
+} .active {
+  border-style: solid;
+  border-width: 2px;
+  border-color: #2F97FF;
+  box-shadow: 0px 0px 20px 5px #2f97ff9b;
+} .btn:hover {
+  border-style: solid;
+  border-width: 2px;
+  border-color: #2F97FF;
+  box-shadow: 0px 0px 20px 5px #2f97ff9b;
+  text-shadow: #2f97ffc4 5px 0px 5px,
+               #2f97ffc4 -5px 0px 5px,
+               #2f97ffc4 0px 5px 5px,
+               #2f97ffc4 0px -5px 5px;
 }
 
 .line {

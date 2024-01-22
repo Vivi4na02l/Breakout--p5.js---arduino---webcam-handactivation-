@@ -5,12 +5,12 @@ document.querySelector('#mainMenu').style.height = window.innerHeight + 'px';
 
 /* dimensions for calibrationScreen div */
 document.querySelector('#calibrationScreen').style.width = window.innerWidth + 'px';
-document.querySelector('#calibrationScreen').style.height = window.innerHeight*0.8 + 'px';
-document.querySelector('#calibrationScreen').style.paddingTop = window.innerHeight*0.1 + 'px';
+document.querySelector('#calibrationScreen').style.height = window.innerHeight*0.3 + 'px';
 
 /* dimensions for play button */
 document.querySelector('#btnPlay').style.width = window.innerWidth*0.25 + 'px';
 document.querySelector('#btnPlay').style.height = window.innerHeight*0.12 + 'px';
+document.querySelector('#txtPlay').style.fontSize = window.innerHeight*0.06 + 'px';
 
 /* dimensions for divControls div */
 document.querySelector('#divControls').style.width = window.innerWidth*0.25 + 'px';
@@ -28,12 +28,6 @@ document.querySelector('#btnReturn').style.width = window.innerWidth*0.1 + 'px';
 document.querySelector('#btnReturn').style.height = window.innerWidth*0.025 + 'px';
 document.querySelector('#btnReturn').style.left = window.innerWidth*0.025 + 'px';
 document.querySelector('#btnReturn').style.top = window.innerWidth*0.025 + 'px';
-
-/* dimensions for line calibration divs */
-document.querySelector('#divLines').style.width = window.innerWidth*0.8 + 'px';
-document.querySelector('#divLines').style.marginTop = window.innerHeight*0.5 + 'px';
-document.querySelector('#lineLeft').style.width = window.innerWidth*0.2 + 'px';
-document.querySelector('#lineRight').style.width = window.innerWidth*0.2 + 'px';
 
 
 

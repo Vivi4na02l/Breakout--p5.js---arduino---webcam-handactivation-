@@ -70,9 +70,9 @@ function draw() {
 
   
   //* ML5 */
+  translate(width, 0);
+  scale(-1, 1); /* inverts canvas so that the webcam hand captation mechanic is less confusion for the player */
   if (document.querySelector('#calibrationScreen').style.display == 'flex') {
-    translate(width, 0);
-    scale(-1, 1); /* inverts canvas so that the webcam hand captation mechanic is less confusion for the player */
     tint(255, 51);
     image(video, 0, 0, width, height);
 
