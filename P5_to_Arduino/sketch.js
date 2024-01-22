@@ -183,7 +183,6 @@ function drawKeypoints() {
           let rectangleH = 30;
           let pinkW = rectangleW * 0.15;
 
-          drawShadowRect(100, 100, 200, 100, 10);
           stroke('#036280');
           strokeWeight(3);
           fill('#000');
